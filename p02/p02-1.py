@@ -89,3 +89,18 @@ print('MAE (Mean Absolute Error):', mean_absolute_error(Y_test, y_pred))
 print('MSE (Mean Squared Error):', mean_squared_error(Y_test, y_pred))
 print('RMSE (Root Mean Squared Error):', np.sqrt(mean_squared_error(Y_test, y_pred)))
 print('R2 Score:', r2_score(Y_test, y_pred))
+
+
+# Predicting the profit for a new investment
+
+print("\n")
+input_env = input('Enter the investment value: ')
+input_inv = float(input_env)
+inv = np.array([input_inv])
+inv = inv.reshape(-1,1)
+
+profit = model.predict(inv)
+print("\n")
+print('Investiment: ', input_inv)
+print('Predicted Profit = {:.4}'.format(profit[0]))
+print("\n")
