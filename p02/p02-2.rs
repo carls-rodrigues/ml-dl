@@ -1,11 +1,13 @@
 use std::fs::File;
 use std::io::{BufRead, BufReader};
 
-fn mean(values: &Vec<f64>) -> f64 {
-    return values.iter().sum::<f64>() / values.len() as f64;
+type Float64 = f64;
+
+fn mean(values: &Vec<Float64>) -> Float64 {
+    return values.iter().sum::<Float64>() / values.len() as Float64;
 }
 
-fn covariance(x: &Vec<f64>, mean_x: f64, y: &Vec<f64>, mean_y: f64) -> f64 {
+fn covariance(x: &Vec<Float64>, mean_x: Float64, y: &Vec<Float64>, mean_y: Float64) -> Float64 {
     let mut covar = 0.0;
     for i in 0..x.len() {
         covar += (x[i] - mean_x) * (y[i] - mean_y);
@@ -13,18 +15,23 @@ fn covariance(x: &Vec<f64>, mean_x: f64, y: &Vec<f64>, mean_y: f64) -> f64 {
     return covar;
 }
 
-fn variance(list: &Vec<f64>, mean: f64) -> f64 {
-    return list.iter().map(|x| (x - mean).powi(2)).sum::<f64>();
+fn variance(list: &Vec<Float64>, mean: Float64) -> Float64 {
+    return list.iter().map(|x| (x - mean).powi(2)).sum::<Float64>();
 }
-fn coefficient(covar: f64, var: f64, mean_x: f64, mean_y: f64) -> (f64, f64) {
+fn coefficient(
+    covar: Float64,
+    var: Float64,
+    mean_x: Float64,
+    mean_y: Float64,
+) -> (Float64, Float64) {
     let b1 = covar / var;
     let b0 = mean_y - (b1 * mean_x);
     return (b1, b0);
 }
-fn load_data(dataset: &str) -> (Vec<f64>, Vec<f64>) {
+fn load_data(dataset: &str) -> (Vec<Float64>, Vec<Float64>) {
     let mut init = 0;
-    let mut x: Vec<f64> = Vec::new();
-    let mut y: Vec<f64> = Vec::new();
+    let mut x: Vec<Float64> = Vec::new();
+    let mut y: Vec<Float64> = Vec::new();
 
     let file = File::open(dataset).expect("file not found");
 
@@ -41,14 +48,14 @@ fn load_data(dataset: &str) -> (Vec<f64>, Vec<f64>) {
             .chars()
             .filter(|&c| c != '\\' && c != '"')
             .collect::<String>()
-            .parse::<f64>()
+            .parse::<Float64>()
             .unwrap();
 
         let row1 = parts[1]
             .chars()
             .filter(|&c| c != '\\' && c != '"')
             .collect::<String>()
-            .parse::<f64>()
+            .parse::<Float64>()
             .unwrap();
 
         x.push(row0);
@@ -56,13 +63,16 @@ fn load_data(dataset: &str) -> (Vec<f64>, Vec<f64>) {
     }
     return (x, y);
 }
-fn split_dataset(x: &Vec<f64>, y: &Vec<f64>) -> (Vec<f64>, Vec<f64>, Vec<f64>, Vec<f64>) {
-    let mut x_train: Vec<f64> = Vec::new();
-    let mut x_test: Vec<f64> = Vec::new();
-    let mut y_train: Vec<f64> = Vec::new();
-    let mut y_test: Vec<f64> = Vec::new();
+fn split_dataset(
+    x: &Vec<Float64>,
+    y: &Vec<Float64>,
+) -> (Vec<Float64>, Vec<Float64>, Vec<Float64>, Vec<Float64>) {
+    let mut x_train: Vec<Float64> = Vec::new();
+    let mut x_test: Vec<Float64> = Vec::new();
+    let mut y_train: Vec<Float64> = Vec::new();
+    let mut y_test: Vec<Float64> = Vec::new();
 
-    let training_size = (x.len() as f64 * 0.8).round() as usize;
+    let training_size = (x.len() as Float64 * 0.8).round() as usize;
 
     x_train = x[0..training_size].to_vec();
     x_test = x[training_size..].to_vec();
@@ -71,19 +81,19 @@ fn split_dataset(x: &Vec<f64>, y: &Vec<f64>) -> (Vec<f64>, Vec<f64>, Vec<f64>, V
 
     return (x_train, x_test, y_train, y_test);
 }
-fn predict(b0: f64, b1: f64, test_x: &Vec<f64>) -> Vec<f64> {
-    let mut predicted_y: Vec<f64> = Vec::new();
+fn predict(b0: Float64, b1: Float64, test_x: &Vec<Float64>) -> Vec<Float64> {
+    let mut predicted_y: Vec<Float64> = Vec::new();
     for i in test_x {
         predicted_y.push(b0 + b1 * i);
     }
     return predicted_y;
 }
-fn rmse(predicted_y: &Vec<f64>, test_y: &Vec<f64>) -> f64 {
+fn rmse(predicted_y: &Vec<Float64>, test_y: &Vec<Float64>) -> Float64 {
     let mut error = 0.0;
     for i in 0..predicted_y.len() {
         error = (predicted_y[i] - test_y[i]).powi(2);
     }
-    let mean_error = error / test_y.len() as f64;
+    let mean_error = error / test_y.len() as Float64;
     return mean_error.sqrt();
 }
 
